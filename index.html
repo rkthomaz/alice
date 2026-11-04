@@ -82,6 +82,9 @@ button { cursor: pointer; }
 .bloco-titulo { font-family: var(--display); font-size: 28px; font-weight: 600; color: var(--terra-dark); text-align: center; }
 .bloco-sub { text-align: center; color: var(--muted); margin-top: 4px; }
 
+.faixa { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.faixa img { width: 100%; height: auto; border-radius: 18px; display: block; }
+
 .rsvp {
   background: var(--sage-soft);
   border-radius: 24px;
@@ -152,6 +155,7 @@ button { cursor: pointer; }
 .cota small { display: block; font-weight: 600; font-size: 12px; text-decoration: none; overflow-wrap: anywhere; }
 .progresso { font-size: 14px; color: var(--muted); }
 .presente .btn { align-self: flex-start; }
+.nota { font-size: 14px; color: var(--muted); }
 
 .janela {
   position: fixed; inset: 0;
@@ -190,9 +194,6 @@ textarea.copia {
 }
 .acoes { display: flex; flex-direction: column; gap: 10px; }
 
-.faixa { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.faixa img { width: 100%; height: auto; border-radius: 18px; display: block; }
-.ilustracao { display: block; width: 100%; max-width: 320px; height: auto; margin: 16px auto 0; border-radius: 18px; }
 .rodape { text-align: center; font-family: var(--hand); font-size: 22px; color: var(--muted); }
 .aviso { font-size: 14px; color: var(--muted); text-align: center; }
 </style>
@@ -227,7 +228,8 @@ textarea.copia {
 
     <div class="apresentacao">
       <p>Oi! Eu sou a Alice, e fico muito feliz que você vai estar no meu chá de bebê. Minha maior alegria é sua presença, mas caso queiram dar algum presente, como ainda não sei escrever e nem sei o que vou usar, <strong>papai</strong> e <strong>mamãe</strong> fizeram uma lista de coisas que acham que eu vou gostar.</p>
-      <p>Já estou dando trabalho pro <strong>papai</strong> e pra <strong>mamãe</strong>, e a <strong>Tânia</strong> já está com medo de que a ração dela passe a ser a mais barata.</p>
+      <p>A ideia é simples: você escolhe um presente da lista, contribui com o valor correspondente via Pix e nós cuidamos das compras! 🎁</p>
+      <p>Tem de tudo: fraldas, roupinhas, café para os pais e até indenização para a <strong>Tânia</strong>, que está prestes a perder o posto de filha única! 😂🐶</p>
     </div>
 
     <svg viewBox="0 0 200 150" width="150" height="112" aria-label="Tânia, a cachorra" role="img">
@@ -247,7 +249,6 @@ textarea.copia {
 
   <div class="faixa" aria-hidden="true">
     <img src="img/dinossauros.png" alt="" loading="lazy">
-    <img src="img/baloes.png" alt="" loading="lazy">
     <img src="img/bichinhos.png" alt="" loading="lazy">
   </div>
 
@@ -277,7 +278,6 @@ textarea.copia {
     <div>
       <h2 id="t-presentes" class="bloco-titulo">Lista de presentes</h2>
       <p class="bloco-sub">Escolhe o que você quiser e a gente risca aqui pra ninguém repetir. O Pix já aparece prontinho pra pagar.</p>
-      <img class="ilustracao" src="img/brinquedos.png" alt="Brinquedos desenhados: blocos, pião, tambor, pato com rodinhas e um ursinho" loading="lazy">
     </div>
     <div id="presentes" class="presentes"></div>
   </section>
@@ -332,20 +332,52 @@ const CHAVE_PIX = '+5551981510435';
 const NOME_RECEBEDOR = 'CATARINA GUGLIELMI';
 const CIDADE_RECEBEDOR = 'PORTO ALEGRE';
 
+// valorCota: valor de cada item ou cota.
+// cotas: quantas partes existem (1 = item único).
+// naoRiscar: o item fica sem riscar, mas o Pix continua disponível.
 const PRESENTES = [
-  { id: 'fraldas',    nome: 'Fraldas RN e P (pacote)',                       valor: 80,   cotas: 1 },
-  { id: 'banho',      nome: 'Kit banho (toalhas, sabonete, shampoo)',        valor: 60,   cotas: 1 },
-  { id: 'roupinhas',  nome: 'Roupinhas 0 a 3 meses (kit com 5 bodies)',      valor: 120,  cotas: 1 },
-  { id: 'manta',      nome: 'Manta de algodão',                              valor: 70,   cotas: 1 },
-  { id: 'termometro', nome: 'Termômetro digital de banho',                   valor: 50,   cotas: 1 },
-  { id: 'higiene',    nome: 'Kit higiene (lenços, pomada, cremes)',          valor: 90,   cotas: 1 },
-  { id: 'saco',       nome: 'Saco de dormir',                                valor: 150,  cotas: 1 },
-  { id: 'petisco',    nome: 'Petisco pra Tânia (pra ela não ficar triste)',  valor: 100,  cotas: 1 },
-  { id: 'cafe',       nome: 'Café pro papai (ele vai precisar)',             valor: 60,   cotas: 1 },
-  { id: 'mango',      nome: 'Energético Mango Loco pra mamãe',               valor: 80,   cotas: 1 },
-  { id: 'baba',       nome: 'Babá eletrônica (vaquinha)',                    valor: 300,  cotas: 4 },
-  { id: 'moises',     nome: 'Berço portátil ou moisés (vaquinha)',           valor: 600,  cotas: 5 },
-  { id: 'carrinho',   nome: 'Carrinho de bebê (vaquinha)',                   valor: 1500, cotas: 10 },
+  { id: 'fraldas',         nome: 'Fraldas RN e P (pacote)',                          valorCota: 50,   cotas: 1, naoRiscar: true },
+  { id: 'banho',           nome: 'Kit banho (toalhas, sabonete e shampoo)',          valorCota: 85,   cotas: 1 },
+  { id: 'roupinhas',       nome: 'Roupinhas 0 a 3 meses',                            valorCota: 120,  cotas: 2 },
+  { id: 'manta',           nome: 'Manta de algodão',                                 valorCota: 70,   cotas: 3 },
+  { id: 'termometro',      nome: 'Termômetro digital de banho',                      valorCota: 30,   cotas: 1 },
+  { id: 'higiene',         nome: 'Kit higiene (lenços, pomada e cremes)',            valorCota: 90,   cotas: 1 },
+  { id: 'saco',            nome: 'Saco de dormir',                                   valorCota: 120,  cotas: 1 },
+  { id: 'paninhos',        nome: 'Kit de paninhos de boca',                          valorCota: 40,   cotas: 1 },
+  { id: 'meias',           nome: 'Kit de meias',                                     valorCota: 40,   cotas: 5 },
+  { id: 'mordedor',        nome: 'Mordedor',                                         valorCota: 50,   cotas: 1 },
+  { id: 'naninha',         nome: 'Naninha',                                          valorCota: 60,   cotas: 1 },
+  { id: 'babadores',       nome: 'Babadores',                                        valorCota: 20,   cotas: 3 },
+  { id: 'trocador',        nome: 'Trocador portátil',                                valorCota: 100,  cotas: 1 },
+  { id: 'livrinhos',       nome: 'Livrinhos de pano',                                valorCota: 45,   cotas: 1 },
+  { id: 'tapete',          nome: 'Tapete de atividades',                             valorCota: 180,  cotas: 1 },
+  { id: 'almofada',        nome: 'Almofada de amamentação',                          valorCota: 150,  cotas: 1 },
+  { id: 'brinq-banho',     nome: 'Kit de brinquedos para banho',                     valorCota: 60,   cotas: 3 },
+  { id: 'baba',            nome: 'Babá eletrônica',                                  valorCota: 75,   cotas: 4 },
+  { id: 'moises',          nome: 'Berço portátil ou moisés',                         valorCota: 120,  cotas: 5 },
+  { id: 'carrinho',        nome: 'Carrinho de bebê',                                 valorCota: 150,  cotas: 10 },
+  { id: 'cadeira',         nome: 'Cadeira de alimentação',                           valorCota: 200,  cotas: 2 },
+  { id: 'cadeirinha',      nome: 'Cadeirinha para carro',                            valorCota: 100,  cotas: 4 },
+  { id: 'cafe',            nome: 'Café para o papai',                                valorCota: 60,   cotas: 5 },
+  { id: 'mango',           nome: 'Pack de Energético Mango Loco para a mamãe',       valorCota: 80,   cotas: 5 },
+  { id: 'massagem',        nome: 'Massagem pra mamãe',                               valorCota: 150,  cotas: 2 },
+  { id: 'tenis',           nome: 'Parar o tempo por 1h no dia pro papai jogar tênis', valorCota: 80,  cotas: 1 },
+  { id: 'pilates',         nome: 'Parar o tempo por 1h no dia pra mamãe ir no pilates', valorCota: 80, cotas: 1 },
+  { id: 'sono',            nome: 'Vale 8h de sono (entrega não garantida)',          valorCota: 100,  cotas: 1 },
+  { id: 'ifood',           nome: 'Fundo iFood para os pais que esqueceram de cozinhar', valorCota: 100, cotas: 3 },
+  { id: 'chocolate',       nome: 'Kit chocolate para crises da mamãe',               valorCota: 50,   cotas: 1 },
+  { id: 'aperol',          nome: 'Primeiro Aperol Spritz da mamãe depois do parto',  valorCota: 40,   cotas: 1 },
+  { id: 'banho-premium',   nome: 'Vale um banho premium de 20 minutos para a mamãe', valorCota: 100,  cotas: 1 },
+  { id: 'encontro',        nome: 'Fundo para o primeiro encontro dos pais pós-bebê', valorCota: 300,  cotas: 1 },
+  { id: 'dignidade',       nome: 'Kit recuperação da dignidade pós-noite em claro',  valorCota: 150,  cotas: 1 },
+  { id: 'petisco',         nome: 'Petisco para a Tânia (pra ela não ficar triste)',  valorCota: 40,   cotas: 1 },
+  { id: 'brinq-tania',     nome: 'Brinquedo novo pra Tânia para compensar dividir a atenção', valorCota: 70, cotas: 1 },
+  { id: 'terapia',         nome: 'Terapia para a Tânia aceitar a irmã',              valorCota: 200,  cotas: 1 },
+  { id: 'indenizacao',     nome: 'Indenização por danos emocionais à Tânia',         valorCota: 200,  cotas: 1 },
+  { id: 'curso',           nome: 'Curso intensivo de dormir a noite inteira pra Alice', valorCota: 300, cotas: 1 },
+  { id: 'viagem',          nome: 'Fundo para a primeira viagem em família',          valorCota: 200,  cotas: 5 },
+  { id: 'seguro',          nome: 'Seguro contra explosões de fralda',                valorCota: 150,  cotas: 3 },
+  { id: 'teste',           nome: 'Teste (R$ 1,00)',                                  valorCota: 1,    cotas: 1 },
 ];
 
 // ====== UTILITÁRIOS ======
@@ -412,7 +444,7 @@ function api(caminho, opts = {}) {
 
 let cotas = {};       // slotId -> { id, presente, n, por }
 let presencas = [];   // { nome, vai, acompanhante }
-let contexto = null;  // { gift, slot, valorCota }
+let contexto = null;  // { gift, slot }
 let nomeConfirmado = null;
 
 async function carregar() {
@@ -466,23 +498,25 @@ async function registrarPresenca(nome, vai, acompanhante) {
 
 // ====== RENDER ======
 function slotsDe(g) { return Array.from({ length: g.cotas }, (_, i) => g.id + '-' + (i + 1)); }
-function valorDaCota(g) { return g.valor / g.cotas; }
+function valorDaCota(g) { return g.valorCota; }
 
 function renderPresentes() {
   const lista = document.getElementById('presentes');
   lista.replaceChildren(...PRESENTES.map(g => {
     const slots = slotsDe(g);
     const ocupados = slots.filter(s => cotas[s]).length;
-    const feito = ocupados === slots.length;
+    const feito = !g.naoRiscar && ocupados === slots.length;
     const unica = g.cotas === 1;
 
     const topo = el('div', { class: 'presente-topo' },
       el('div', { class: 'presente-nome' }, g.nome),
-      el('div', { class: 'valor' }, unica ? 'R$ ' + fmt(g.valor) : 'R$ ' + fmt(valorDaCota(g)) + ' por cota')
+      el('div', { class: 'valor' }, unica ? 'R$ ' + fmt(g.valorCota) : 'R$ ' + fmt(g.valorCota) + ' cada')
     );
 
     let corpo;
-    if (unica) {
+    if (g.naoRiscar) {
+      corpo = el('button', { class: 'btn mini', type: 'button', onclick: () => verPix(g) }, 'Ver Pix');
+    } else if (unica) {
       const s = slots[0];
       corpo = cotas[s]
         ? el('p', { class: 'feito-txt' }, 'Já presenteado por ' + (cotas[s].por || 'alguém'))
@@ -497,12 +531,13 @@ function renderPresentes() {
           'aria-label': 'Cota ' + (i + 1) + (ocupada ? ', já marcada' : ', disponível'),
           onclick: () => escolher(g, s),
         }, 'Cota ' + (i + 1),
-           el('small', {}, ocupada ? (cotas[s].por || 'marcada') : 'R$ ' + fmt(valorDaCota(g))));
+           el('small', {}, ocupada ? (cotas[s].por || 'marcada') : 'R$ ' + fmt(g.valorCota)));
       }));
     }
 
-    const progresso = unica ? null : el('p', { class: 'progresso' }, ocupados + ' de ' + g.cotas + ' cotas marcadas');
-    return el('article', { class: 'presente' + (feito ? ' feito' : '') }, topo, progresso, corpo);
+    const progresso = unica || g.naoRiscar ? null : el('p', { class: 'progresso' }, ocupados + ' de ' + g.cotas + ' marcadas');
+    const nota = g.naoRiscar ? el('p', { class: 'nota' }, 'Este item não é riscado. Pode pagar pelo Pix quando quiser.') : null;
+    return el('article', { class: 'presente' + (feito ? ' feito' : '') }, topo, nota, progresso, corpo);
   }));
 }
 
@@ -583,7 +618,7 @@ function mostrarPix(titulo, valor, aviso, podeDesfazer) {
 }
 
 function verPix(g) {
-  contexto = { gift: g, slot: null, valorCota: valorDaCota(g) };
+  contexto = { gift: g, slot: null };
   mostrarPix(g.nome, valorDaCota(g),
     online ? '' : 'A lista não está disponível agora. Você pode pagar pelo Pix mesmo assim.', false);
   abrirJanela();
@@ -591,11 +626,11 @@ function verPix(g) {
 
 function escolher(g, slot) {
   if (!online) { verPix(g); return; }
-  contexto = { gift: g, slot, valorCota: valorDaCota(g) };
+  contexto = { gift: g, slot };
   document.getElementById('janela-titulo').textContent = 'Marcar presente';
   document.getElementById('marcar-desc').textContent = g.cotas > 1
-    ? 'Você vai dar a ' + slot.split('-')[1] + 'ª cota de "' + g.nome + '" (R$ ' + fmt(valorDaCota(g)) + ').'
-    : 'Você vai dar: ' + g.nome + ' (R$ ' + fmt(g.valor) + ').';
+    ? 'Você vai dar a ' + slot.split('-').pop() + 'ª cota de "' + g.nome + '" (R$ ' + fmt(g.valorCota) + ').'
+    : 'Você vai dar: ' + g.nome + ' (R$ ' + fmt(g.valorCota) + ').';
   inputNomeMarcar.value = (() => { try { return localStorage.getItem('alice_nome') || ''; } catch { return ''; } })();
   msgMarcar.textContent = '';
   pixBox.hidden = true;
@@ -610,13 +645,14 @@ formMarcar.addEventListener('submit', async e => {
   if (!nome) { msgMarcar.textContent = 'Escreva seu nome para marcar.'; inputNomeMarcar.focus(); return; }
   const { gift, slot } = contexto;
   try {
-    const resultado = await marcarCota(slot, gift.id, Number(slot.split('-')[1]), nome);
+    const resultado = await marcarCota(slot, gift.id, Number(slot.split('-').pop()), nome);
     if (resultado === 'ocupada') {
       msgMarcar.textContent = 'Essa cota acabou de ser marcada por outra pessoa. Escolha outra.';
       carregar();
       return;
     }
     try { localStorage.setItem('alice_nome', nome); } catch {}
+    contexto.slot = slot;
     mostrarPix(gift.nome, valorDaCota(gift), 'Presente marcado para ' + nome + '. Obrigada!', true);
     carregar();
   } catch {
