@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chá de bebê da Alice</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Caveat:wght@500;600&family=Nunito:wght@400;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root {
+  --bg: #FDF1E4;
+  --card: #FFF9F2;
+  --fg: #5C4033;
+  --muted: #8A6B5C;
+  --terra: #B8664A;
+  --terra-dark: #9A4F36;
+  --sage: #A9B9A0;
+  --sage-soft: #DCE5D5;
+  --mostarda: #E4B04E;
+  --coral: #EE8473;
+  --line: #EBD7C4;
+  --display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --hand: 'Caveat', 'Nunito', cursive;
+  --text: 'Nunito', system-ui, -apple-system, sans-serif;
+}
+html { color-scheme: light; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 56px;
+  overflow-x: hidden;
+}
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--mostarda); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+.convite {
+  background: var(--card);
+  border-radius: 28px;
+  padding: 28px 22px 26px;
+  text-align: center;
+  box-shadow: 0 1px 0 var(--line), 0 12px 30px -18px rgba(92, 64, 51, .35);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.deco { width: 100%; max-width: 360px; height: auto; display: block; }
+.kicker { font-family: var(--hand); font-size: 26px; color: var(--muted); }
+.nome {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(64px, 19vw, 96px);
+  line-height: 1;
+  color: var(--terra);
+  letter-spacing: .5px;
+}
+.nome span { display: inline-block; }
+.nome .l2 { color: var(--mostarda); }
+.nome .l3 { color: var(--sage); }
+.nome .l4 { color: var(--coral); }
+.nome .l5 { color: var(--terra-dark); }
+.data { font-family: var(--display); font-weight: 600; font-size: 22px; margin-top: 4px; }
+.hora { font-family: var(--hand); font-size: 24px; color: var(--muted); }
+.local { font-weight: 700; margin-top: 6px; }
+.salao { font-family: var(--hand); font-size: 22px; color: var(--muted); }
+
+.apresentacao { font-size: 17px; line-height: 1.65; text-align: left; }
+.apresentacao strong { color: var(--terra-dark); }
+.apresentacao p + p { margin-top: 12px; }
+
+.bloco-titulo { font-family: var(--display); font-size: 28px; font-weight: 600; color: var(--terra-dark); text-align: center; }
+.bloco-sub { text-align: center; color: var(--muted); margin-top: 4px; }
+
+.rsvp {
+  background: var(--sage-soft);
+  border-radius: 24px;
+  padding: 22px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-weight: 700; font-size: 15px; }
+.campo input {
+  border: 2px solid transparent;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: var(--fg);
+  width: 100%;
+  min-width: 0;
+}
+.campo input:focus { outline: none; border-color: var(--terra); }
+.linha-botoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  flex: 1 1 140px;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-weight: 700;
+  font-size: 16px;
+  background: var(--terra);
+  color: #fff;
+  transition: transform .15s ease, background .15s ease;
+}
+.btn:hover:not(:disabled) { background: var(--terra-dark); }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn:disabled { background: #CDBBAE; cursor: not-allowed; }
+.btn.sec { background: #fff; color: var(--terra-dark); border: 2px solid var(--terra); }
+.btn.sec:hover:not(:disabled) { background: #FFF3EA; }
+.btn.mini { flex: 0 0 auto; padding: 9px 14px; font-size: 14px; }
+.msg { font-size: 15px; color: var(--terra-dark); min-height: 1.5em; }
+.contador { font-family: var(--display); font-size: 20px; font-weight: 600; text-align: center; }
+
+.presentes { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; }
+.presente {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  border: 1px solid var(--line);
+}
+.presente.feito { background: #F3EBE1; }
+.presente-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.presente-nome { font-weight: 700; font-size: 17px; min-width: 0; overflow-wrap: anywhere; }
+.presente.feito .presente-nome { text-decoration: line-through; text-decoration-color: var(--terra); color: var(--muted); }
+.valor { font-family: var(--display); font-weight: 600; font-size: 18px; color: var(--terra-dark); white-space: nowrap; }
+.presente.feito .valor { color: var(--muted); }
+.feito-txt { font-family: var(--hand); font-size: 22px; color: var(--terra-dark); }
+.cotas { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.cota {
+  border: 2px dashed var(--sage);
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 6px;
+  font-weight: 700;
+  color: var(--fg);
+  font-size: 14px;
+  min-width: 0;
+}
+.cota:hover:not(:disabled) { border-style: solid; border-color: var(--terra); }
+.cota.ocupada { background: #EFE8DF; border: 2px solid #E4D7C8; color: var(--muted); text-decoration: line-through; cursor: not-allowed; }
+.cota small { display: block; font-weight: 600; font-size: 12px; text-decoration: none; overflow-wrap: anywhere; }
+.progresso { font-size: 14px; color: var(--muted); }
+.presente .btn { align-self: flex-start; }
+
+.janela {
+  position: fixed; inset: 0;
+  background: rgba(92, 64, 51, .45);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+}
+.painel {
+  background: var(--card);
+  width: 100%; max-width: 480px;
+  max-height: 92vh; overflow-y: auto;
+  border-radius: 26px;
+  padding: 24px 22px 22px;
+  display: flex; flex-direction: column; gap: 14px;
+  position: relative;
+}
+.fechar {
+  position: absolute; top: 12px; right: 12px;
+  border: 0; background: #F3E6D8; color: var(--fg);
+  width: 36px; height: 36px; border-radius: 50%;
+  font-size: 20px; line-height: 1;
+}
+.painel h3 { font-family: var(--display); font-size: 24px; font-weight: 600; color: var(--terra-dark); padding-right: 40px; overflow-wrap: anywhere; }
+.instrucao { font-size: 15px; text-align: center; }
+.qr { background: #fff; border-radius: 18px; padding: 14px; display: flex; justify-content: center; }
+.qr svg { width: 100%; max-width: 260px; height: auto; display: block; }
+.valor-grande { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--terra); text-align: center; }
+textarea.copia {
+  width: 100%; min-height: 96px; resize: vertical;
+  border: 2px solid var(--line); border-radius: 14px;
+  padding: 10px 12px; font-size: 13px; color: var(--fg); background: #fff;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  word-break: break-all;
+}
+.acoes { display: flex; flex-direction: column; gap: 10px; }
+
+.faixa { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.faixa img { width: 100%; height: auto; border-radius: 18px; display: block; }
+.ilustracao { display: block; width: 100%; max-width: 320px; height: auto; margin: 16px auto 0; border-radius: 18px; }
+.rodape { text-align: center; font-family: var(--hand); font-size: 22px; color: var(--muted); }
+.aviso { font-size: 14px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="convite" aria-labelledby="titulo">
+    <svg class="deco" viewBox="0 0 320 70" aria-hidden="true">
+      <g fill="none" stroke="#B8664A" stroke-width="1.4" stroke-linecap="round">
+        <path d="M40 60 Q 36 40 44 22"/>
+        <path d="M160 64 Q 156 40 162 16"/>
+        <path d="M282 60 Q 276 40 280 24"/>
+      </g>
+      <ellipse cx="46" cy="18" rx="16" ry="20" fill="#E4B04E" opacity=".85"/>
+      <ellipse cx="108" cy="22" rx="14" ry="18" fill="#EE8473" opacity=".85"/>
+      <ellipse cx="162" cy="14" rx="18" ry="22" fill="#A9B9A0"/>
+      <ellipse cx="222" cy="22" rx="14" ry="18" fill="#F6C9A8"/>
+      <ellipse cx="278" cy="18" rx="16" ry="20" fill="#EE8473" opacity=".85"/>
+      <circle cx="78" cy="48" r="5" fill="#A9B9A0"/>
+      <circle cx="246" cy="50" r="5" fill="#E4B04E"/>
+    </svg>
+    <p class="kicker">venha para o chá de bebê</p>
+    <p class="kicker" style="font-size:18px; letter-spacing:2px; text-transform:uppercase;">da pequena</p>
+    <h1 id="titulo" class="nome" aria-label="Alice">
+      <span class="l1">A</span><span class="l2">l</span><span class="l3">i</span><span class="l4">c</span><span class="l5">e</span>
+    </h1>
+    <p class="data">sábado, 19 de dezembro de 2026</p>
+    <p class="hora">às 16h30</p>
+    <p class="local">Rua Josemaria Escrivá, 669</p>
+    <p class="salao">Salão Party Club</p>
+
+    <div class="apresentacao">
+      <p>Oi! Eu sou a Alice, e fico muito feliz que você vai estar no meu chá de bebê. Minha maior alegria é sua presença, mas caso queiram dar algum presente, como ainda não sei escrever e nem sei o que vou usar, <strong>papai</strong> e <strong>mamãe</strong> fizeram uma lista de coisas que acham que eu vou gostar.</p>
+      <p>Já estou dando trabalho pro <strong>papai</strong> e pra <strong>mamãe</strong>, e a <strong>Tânia</strong> já está com medo de que a ração dela passe a ser a mais barata.</p>
+    </div>
+
+    <svg viewBox="0 0 200 150" width="150" height="112" aria-label="Tânia, a cachorra" role="img">
+      <ellipse cx="100" cy="140" rx="70" ry="8" fill="#E4D2BF"/>
+      <path d="M60 130 Q 40 80 70 60 Q 100 40 130 60 Q 160 80 140 130 Z" fill="#E8B98F"/>
+      <path d="M70 60 Q 60 20 88 22 Q 100 40 96 62 Z" fill="#B8664A"/>
+      <path d="M130 60 Q 140 20 112 22 Q 100 40 104 62 Z" fill="#B8664A"/>
+      <ellipse cx="100" cy="72" rx="34" ry="30" fill="#F7E3CB"/>
+      <path d="M86 70 Q 90 66 94 70" fill="none" stroke="#5C4033" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M106 70 Q 110 66 114 70" fill="none" stroke="#5C4033" stroke-width="2.2" stroke-linecap="round"/>
+      <ellipse cx="100" cy="82" rx="6" ry="4.5" fill="#5C4033"/>
+      <path d="M92 90 Q 100 97 108 90" fill="none" stroke="#5C4033" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="82" cy="84" rx="5" ry="3" fill="#EE8473" opacity=".6"/>
+      <ellipse cx="118" cy="84" rx="5" ry="3" fill="#EE8473" opacity=".6"/>
+    </svg>
+  </header>
+
+  <div class="faixa" aria-hidden="true">
+    <img src="img/dinossauros.png" alt="" loading="lazy">
+    <img src="img/baloes.png" alt="" loading="lazy">
+    <img src="img/bichinhos.png" alt="" loading="lazy">
+  </div>
+
+  <section aria-labelledby="t-presenca" class="rsvp">
+    <div>
+      <h2 id="t-presenca" class="bloco-titulo">Você vai?</h2>
+      <p class="bloco-sub">Confirme sua presença e leve mais uma pessoa, se quiser.</p>
+    </div>
+    <form id="rsvp" novalidate style="display:flex; flex-direction:column; gap:14px;">
+      <div class="campo">
+        <label for="nome-rsvp">Seu nome</label>
+        <input id="nome-rsvp" maxlength="60" autocomplete="name" placeholder="Como você se chama?">
+      </div>
+      <div class="linha-botoes">
+        <button class="btn" type="submit" data-vai="sim">Vou</button>
+        <button class="btn sec" type="button" id="btn-nao">Não vou</button>
+      </div>
+      <p id="rsvp-msg" class="msg" aria-live="polite"></p>
+      <div id="rsvp-mais" hidden class="linha-botoes">
+        <button class="btn" type="button" id="btn-mais">Confirmar para mais uma pessoa</button>
+      </div>
+      <p id="rsvp-contador" class="contador" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section aria-labelledby="t-presentes">
+    <div>
+      <h2 id="t-presentes" class="bloco-titulo">Lista de presentes</h2>
+      <p class="bloco-sub">Escolhe o que você quiser e a gente risca aqui pra ninguém repetir. O Pix já aparece prontinho pra pagar.</p>
+      <img class="ilustracao" src="img/brinquedos.png" alt="Brinquedos desenhados: blocos, pião, tambor, pato com rodinhas e um ursinho" loading="lazy">
+    </div>
+    <div id="presentes" class="presentes"></div>
+  </section>
+
+  <p class="rodape">até lá, com carinho!</p>
+  <p id="aviso-lista" class="aviso" aria-live="polite"></p>
+</div>
+
+<div id="janela" class="janela" hidden role="dialog" aria-modal="true" aria-labelledby="janela-titulo">
+  <div class="painel">
+    <button class="fechar" type="button" id="btn-fechar" aria-label="Fechar">×</button>
+
+    <form id="form-marcar" hidden novalidate style="display:flex; flex-direction:column; gap:14px;">
+      <h3 id="janela-titulo">Marcar presente</h3>
+      <p id="marcar-desc" class="instrucao"></p>
+      <div class="campo">
+        <label for="nome-marcar">Seu nome</label>
+        <input id="nome-marcar" maxlength="60" autocomplete="name" placeholder="Como você se chama?">
+      </div>
+      <p id="marcar-msg" class="msg" aria-live="polite"></p>
+      <button class="btn" type="submit">Marcar e ver o Pix</button>
+    </form>
+
+    <div id="pix" hidden style="display:flex; flex-direction:column; gap:14px;">
+      <h3 id="pix-titulo"></h3>
+      <p class="valor-grande" id="pix-valor"></p>
+      <p class="instrucao">Pague pelo app do seu banco, lendo o QR Code ou usando o código abaixo.</p>
+      <div class="qr" id="pix-qr"></div>
+      <div class="campo">
+        <label for="pix-copia">Pix copia e cola</label>
+        <textarea id="pix-copia" class="copia" readonly></textarea>
+      </div>
+      <div class="acoes">
+        <button class="btn" type="button" id="btn-copiar">Copiar código Pix</button>
+        <button class="btn sec" type="button" id="btn-desfazer" hidden>Desfazer minha marcação</button>
+        <p id="pix-aviso" class="aviso" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== CONFIGURAÇÃO ======
+// Cole a Project URL e a chave "anon public" do seu projeto Supabase
+// (Project Settings > API). Não use a chave "service_role".
+const SUPABASE_URL = 'COLE_A_PROJECT_URL_AQUI';        // ex.: https://xyzabc.supabase.co
+const SUPABASE_ANON_KEY = 'COLE_A_ANON_KEY_AQUI';
+
+const ATUALIZA_A_CADA_MS = 8000;
+
+const CHAVE_PIX = '+5551981510435';
+const NOME_RECEBEDOR = 'CATARINA GUGLIELMI';
+const CIDADE_RECEBEDOR = 'PORTO ALEGRE';
+
+const PRESENTES = [
+  { id: 'fraldas',    nome: 'Fraldas RN e P (pacote)',                       valor: 80,   cotas: 1 },
+  { id: 'banho',      nome: 'Kit banho (toalhas, sabonete, shampoo)',        valor: 60,   cotas: 1 },
+  { id: 'roupinhas',  nome: 'Roupinhas 0 a 3 meses (kit com 5 bodies)',      valor: 120,  cotas: 1 },
+  { id: 'manta',      nome: 'Manta de algodão',                              valor: 70,   cotas: 1 },
+  { id: 'termometro', nome: 'Termômetro digital de banho',                   valor: 50,   cotas: 1 },
+  { id: 'higiene',    nome: 'Kit higiene (lenços, pomada, cremes)',          valor: 90,   cotas: 1 },
+  { id: 'saco',       nome: 'Saco de dormir',                                valor: 150,  cotas: 1 },
+  { id: 'petisco',    nome: 'Petisco pra Tânia (pra ela não ficar triste)',  valor: 100,  cotas: 1 },
+  { id: 'cafe',       nome: 'Café pro papai (ele vai precisar)',             valor: 60,   cotas: 1 },
+  { id: 'mango',      nome: 'Energético Mango Loco pra mamãe',               valor: 80,   cotas: 1 },
+  { id: 'baba',       nome: 'Babá eletrônica (vaquinha)',                    valor: 300,  cotas: 4 },
+  { id: 'moises',     nome: 'Berço portátil ou moisés (vaquinha)',           valor: 600,  cotas: 5 },
+  { id: 'carrinho',   nome: 'Carrinho de bebê (vaquinha)',                   valor: 1500, cotas: 10 },
+];
+
+// ====== UTILITÁRIOS ======
+const fmt = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === undefined || v === null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (k === 'disabled') n.disabled = true;
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) {
+    if (c === null || c === undefined || c === false) continue;
+    n.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return n;
+}
+
+// ====== PIX (BR Code estático com valor) ======
+function tlv(id, val) { return id + String(val.length).padStart(2, '0') + val; }
+function crc16(str) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < str.length; i++) {
+    crc ^= str.charCodeAt(i) << 8;
+    for (let b = 0; b < 8; b++) {
+      crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) & 0xFFFF : (crc << 1) & 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+function pixPayload(valor) {
+  const conta = tlv('00', 'br.gov.bcb.pix') + tlv('01', CHAVE_PIX);
+  let p = tlv('00', '01') + tlv('26', conta) + tlv('52', '0000') + tlv('53', '986')
+        + tlv('54', valor.toFixed(2)) + tlv('58', 'BR')
+        + tlv('59', NOME_RECEBEDOR) + tlv('60', CIDADE_RECEBEDOR)
+        + tlv('62', tlv('05', '***'));
+  p += '6304';
+  return p + crc16(p);
+}
+function qrSvg(texto) {
+  const q = qrcode(0, 'M');
+  q.addData(texto);
+  q.make();
+  return q.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+}
+
+// ====== BANCO (Supabase REST) ======
+const online = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('COLE_');
+
+function api(caminho, opts = {}) {
+  return fetch(SUPABASE_URL + '/rest/v1/' + caminho, {
+    ...opts,
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      ...(opts.headers || {}),
+    },
+  });
+}
+
+let cotas = {};       // slotId -> { id, presente, n, por }
+let presencas = [];   // { nome, vai, acompanhante }
+let contexto = null;  // { gift, slot, valorCota }
+let nomeConfirmado = null;
+
+async function carregar() {
+  if (!online) return;
+  try {
+    const [rc, rp] = await Promise.all([
+      api('cotas?select=*'),
+      api('presencas?select=*&order=created_at.asc'),
+    ]);
+    if (rc.ok) {
+      const lista = await rc.json();
+      cotas = {};
+      lista.forEach(c => { cotas[c.id] = c; });
+    }
+    if (rp.ok) presencas = await rp.json();
+    document.getElementById('aviso-lista').textContent = '';
+    render();
+  } catch {
+    document.getElementById('aviso-lista').textContent = 'Não consegui atualizar a lista agora. Tentando de novo em instantes.';
+  }
+}
+
+async function marcarCota(slot, presente, n, por) {
+  // A chave primária (id) garante que só uma pessoa marca cada cota.
+  const r = await api('cotas', {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ id: slot, presente, n, por }),
+  });
+  if (r.status === 409) return 'ocupada';
+  if (!r.ok) throw new Error('marcar');
+  return 'ok';
+}
+
+async function desmarcarCota(slot) {
+  const r = await api('cotas?id=eq.' + encodeURIComponent(slot), {
+    method: 'DELETE',
+    headers: { Prefer: 'return=minimal' },
+  });
+  if (!r.ok) throw new Error('desmarcar');
+}
+
+async function registrarPresenca(nome, vai, acompanhante) {
+  const r = await api('presencas', {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ nome, vai, acompanhante }),
+  });
+  if (!r.ok) throw new Error('presenca');
+}
+
+// ====== RENDER ======
+function slotsDe(g) { return Array.from({ length: g.cotas }, (_, i) => g.id + '-' + (i + 1)); }
+function valorDaCota(g) { return g.valor / g.cotas; }
+
+function renderPresentes() {
+  const lista = document.getElementById('presentes');
+  lista.replaceChildren(...PRESENTES.map(g => {
+    const slots = slotsDe(g);
+    const ocupados = slots.filter(s => cotas[s]).length;
+    const feito = ocupados === slots.length;
+    const unica = g.cotas === 1;
+
+    const topo = el('div', { class: 'presente-topo' },
+      el('div', { class: 'presente-nome' }, g.nome),
+      el('div', { class: 'valor' }, unica ? 'R$ ' + fmt(g.valor) : 'R$ ' + fmt(valorDaCota(g)) + ' por cota')
+    );
+
+    let corpo;
+    if (unica) {
+      const s = slots[0];
+      corpo = cotas[s]
+        ? el('p', { class: 'feito-txt' }, 'Já presenteado por ' + (cotas[s].por || 'alguém'))
+        : el('button', { class: 'btn mini', type: 'button', onclick: () => escolher(g, s) }, 'Quero dar este');
+    } else {
+      corpo = el('div', { class: 'cotas' }, slots.map((s, i) => {
+        const ocupada = !!cotas[s];
+        return el('button', {
+          class: 'cota' + (ocupada ? ' ocupada' : ''),
+          type: 'button',
+          disabled: ocupada,
+          'aria-label': 'Cota ' + (i + 1) + (ocupada ? ', já marcada' : ', disponível'),
+          onclick: () => escolher(g, s),
+        }, 'Cota ' + (i + 1),
+           el('small', {}, ocupada ? (cotas[s].por || 'marcada') : 'R$ ' + fmt(valorDaCota(g))));
+      }));
+    }
+
+    const progresso = unica ? null : el('p', { class: 'progresso' }, ocupados + ' de ' + g.cotas + ' cotas marcadas');
+    return el('article', { class: 'presente' + (feito ? ' feito' : '') }, topo, progresso, corpo);
+  }));
+}
+
+function renderPresenca() {
+  const confirmados = presencas.filter(p => p.vai).length;
+  document.getElementById('rsvp-contador').textContent =
+    confirmados === 0 ? 'Ainda ninguém confirmou.' : confirmados + (confirmados === 1 ? ' pessoa confirmada' : ' pessoas confirmadas');
+}
+
+function render() {
+  renderPresentes();
+  renderPresenca();
+}
+
+// ====== PRESENÇA ======
+const formRsvp = document.getElementById('rsvp');
+const inputNomeRsvp = document.getElementById('nome-rsvp');
+const msgRsvp = document.getElementById('rsvp-msg');
+const boxMais = document.getElementById('rsvp-mais');
+inputNomeRsvp.value = (() => { try { return localStorage.getItem('alice_nome') || ''; } catch { return ''; } })();
+
+async function responder(vai) {
+  const nome = inputNomeRsvp.value.trim();
+  if (!nome) { msgRsvp.textContent = 'Escreva seu nome primeiro.'; inputNomeRsvp.focus(); return; }
+  if (!online) { msgRsvp.textContent = 'A lista não está disponível agora.'; return; }
+  try {
+    await registrarPresenca(nome, vai, false);
+    try { localStorage.setItem('alice_nome', nome); } catch {}
+    nomeConfirmado = nome;
+    msgRsvp.textContent = vai ? 'Oba, obrigada, ' + nome + '! Te vejo lá.' : 'Obrigada por avisar, ' + nome + '.';
+    boxMais.hidden = !vai;
+    carregar();
+  } catch {
+    msgRsvp.textContent = 'Não consegui registrar agora. Tente de novo em instantes.';
+  }
+}
+formRsvp.addEventListener('submit', e => { e.preventDefault(); responder(true); });
+document.getElementById('btn-nao').addEventListener('click', () => responder(false));
+document.getElementById('btn-mais').addEventListener('click', async () => {
+  if (!nomeConfirmado) return;
+  try {
+    await registrarPresenca('Acompanhante de ' + nomeConfirmado, true, true);
+    msgRsvp.textContent = 'Anotado! Mais uma pessoa com você.';
+    carregar();
+  } catch {
+    msgRsvp.textContent = 'Não consegui registrar agora. Tente de novo.';
+  }
+});
+
+// ====== JANELA: MARCAR E PIX ======
+const janela = document.getElementById('janela');
+const formMarcar = document.getElementById('form-marcar');
+const pixBox = document.getElementById('pix');
+const inputNomeMarcar = document.getElementById('nome-marcar');
+const msgMarcar = document.getElementById('marcar-msg');
+const copiaArea = document.getElementById('pix-copia');
+const btnCopiar = document.getElementById('btn-copiar');
+const btnDesfazer = document.getElementById('btn-desfazer');
+const avisoPix = document.getElementById('pix-aviso');
+
+function abrirJanela() { janela.hidden = false; document.body.style.overflow = 'hidden'; }
+function fecharJanela() { janela.hidden = true; document.body.style.overflow = ''; contexto = null; }
+document.getElementById('btn-fechar').addEventListener('click', fecharJanela);
+janela.addEventListener('click', e => { if (e.target === janela) fecharJanela(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !janela.hidden) fecharJanela(); });
+
+function mostrarPix(titulo, valor, aviso, podeDesfazer) {
+  document.getElementById('pix-titulo').textContent = titulo;
+  document.getElementById('pix-valor').textContent = 'R$ ' + fmt(valor);
+  const codigo = pixPayload(valor);
+  copiaArea.value = codigo;
+  document.getElementById('pix-qr').innerHTML = qrSvg(codigo);
+  avisoPix.textContent = aviso || '';
+  btnDesfazer.hidden = !podeDesfazer;
+  btnCopiar.textContent = 'Copiar código Pix';
+  formMarcar.hidden = true;
+  pixBox.hidden = false;
+}
+
+function verPix(g) {
+  contexto = { gift: g, slot: null, valorCota: valorDaCota(g) };
+  mostrarPix(g.nome, valorDaCota(g),
+    online ? '' : 'A lista não está disponível agora. Você pode pagar pelo Pix mesmo assim.', false);
+  abrirJanela();
+}
+
+function escolher(g, slot) {
+  if (!online) { verPix(g); return; }
+  contexto = { gift: g, slot, valorCota: valorDaCota(g) };
+  document.getElementById('janela-titulo').textContent = 'Marcar presente';
+  document.getElementById('marcar-desc').textContent = g.cotas > 1
+    ? 'Você vai dar a ' + slot.split('-')[1] + 'ª cota de "' + g.nome + '" (R$ ' + fmt(valorDaCota(g)) + ').'
+    : 'Você vai dar: ' + g.nome + ' (R$ ' + fmt(g.valor) + ').';
+  inputNomeMarcar.value = (() => { try { return localStorage.getItem('alice_nome') || ''; } catch { return ''; } })();
+  msgMarcar.textContent = '';
+  pixBox.hidden = true;
+  formMarcar.hidden = false;
+  abrirJanela();
+  inputNomeMarcar.focus();
+}
+
+formMarcar.addEventListener('submit', async e => {
+  e.preventDefault();
+  const nome = inputNomeMarcar.value.trim();
+  if (!nome) { msgMarcar.textContent = 'Escreva seu nome para marcar.'; inputNomeMarcar.focus(); return; }
+  const { gift, slot } = contexto;
+  try {
+    const resultado = await marcarCota(slot, gift.id, Number(slot.split('-')[1]), nome);
+    if (resultado === 'ocupada') {
+      msgMarcar.textContent = 'Essa cota acabou de ser marcada por outra pessoa. Escolha outra.';
+      carregar();
+      return;
+    }
+    try { localStorage.setItem('alice_nome', nome); } catch {}
+    mostrarPix(gift.nome, valorDaCota(gift), 'Presente marcado para ' + nome + '. Obrigada!', true);
+    carregar();
+  } catch {
+    msgMarcar.textContent = 'Não consegui marcar agora. Tente de novo.';
+  }
+});
+
+btnDesfazer.addEventListener('click', async () => {
+  if (!contexto || !contexto.slot) return;
+  try {
+    await desmarcarCota(contexto.slot);
+    avisoPix.textContent = 'Marcação desfeita. O item voltou para a lista.';
+    btnDesfazer.hidden = true;
+    carregar();
+  } catch {
+    avisoPix.textContent = 'Não consegui desfazer agora. Tente de novo.';
+  }
+});
+
+btnCopiar.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(copiaArea.value);
+    btnCopiar.textContent = 'Copiado!';
+  } catch {
+    copiaArea.focus();
+    copiaArea.select();
+    btnCopiar.textContent = 'Selecionado, copie acima';
+  }
+});
+
+// ====== INÍCIO ======
+render();
+if (!online) {
+  document.getElementById('aviso-lista').textContent = 'A lista ainda não está conectada. Os Pix já funcionam.';
+}
+carregar();
+setInterval(carregar, ATUALIZA_A_CADA_MS);
+</script>
+</body>
+</html>
