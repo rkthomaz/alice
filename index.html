@@ -336,7 +336,7 @@ const CIDADE_RECEBEDOR = 'PORTO ALEGRE';
 // cotas: quantas partes existem (1 = item único).
 // naoRiscar: o item fica sem riscar, mas o Pix continua disponível.
 const PRESENTES = [
-  { id: 'fraldas',         nome: 'Fraldas RN e P (pacote)',                          valorCota: 50,   cotas: 1, naoRiscar: true },
+  { id: 'fraldas',         nome: 'Fraldas (pacote)',                          valorCota: 50,   cotas: 1, naoRiscar: true },
   { id: 'banho',           nome: 'Kit banho (toalhas, sabonete e shampoo)',          valorCota: 85,   cotas: 1 },
   { id: 'roupinhas',       nome: 'Roupinhas 0 a 3 meses',                            valorCota: 120,  cotas: 2 },
   { id: 'manta',           nome: 'Manta de algodão',                                 valorCota: 70,   cotas: 3 },
@@ -536,7 +536,7 @@ function renderPresentes() {
     }
 
     const progresso = unica || g.naoRiscar ? null : el('p', { class: 'progresso' }, ocupados + ' de ' + g.cotas + ' marcadas');
-    const nota = g.naoRiscar ? el('p', { class: 'nota' }, 'Este item não é riscado. Pode pagar pelo Pix quando quiser.') : null;
+    const nota = g.naoRiscar ? el('p', { class: 'nota' }, 'Este item pode ser comprado por mais deuma pessoa.') : null;
     return el('article', { class: 'presente' + (feito ? ' feito' : '') }, topo, nota, progresso, corpo);
   }));
 }
