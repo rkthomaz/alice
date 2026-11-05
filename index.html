@@ -255,7 +255,7 @@ textarea.copia {
   <section aria-labelledby="t-presenca" class="rsvp">
     <div>
       <h2 id="t-presenca" class="bloco-titulo">Você vai?</h2>
-      <p class="bloco-sub">Confirme sua presença e de quem mais irá com você!</p>
+      <p class="bloco-sub">Confirme sua presença e leve mais uma pessoa, se quiser.</p>
     </div>
     <form id="rsvp" novalidate style="display:flex; flex-direction:column; gap:14px;">
       <div class="campo">
@@ -298,7 +298,7 @@ textarea.copia {
         <input id="nome-marcar" maxlength="60" autocomplete="name" placeholder="Como você se chama?">
       </div>
       <p id="marcar-msg" class="msg" aria-live="polite"></p>
-      <button class="btn" type="submit">Marcar e ver o Pix</button>
+      <button class="btn" type="submit" id="btn-submit-marcar">Marcar e ver o Pix</button>
     </form>
 
     <div id="pix" hidden style="display:flex; flex-direction:column; gap:14px;">
@@ -323,7 +323,7 @@ textarea.copia {
 // ====== CONFIGURAÇÃO ======
 // Cole a Project URL e a chave "anon public" do seu projeto Supabase
 // (Project Settings > API). Não use a chave "service_role".
-const SUPABASE_URL = 'https://wjkvynbzbmrgjemviiys.supabase.co';        // ex.: https://xyzabc.supabase.co
+const SUPABASE_URL = 'https://wjkvynbzbmrgjemviiys.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_LwJkaFwWT2xIaVd8fGKLAA_ASfKmWdQ';
 
 const ATUALIZA_A_CADA_MS = 8000;
@@ -377,6 +377,7 @@ const PRESENTES = [
   { id: 'curso',           nome: 'Curso intensivo de dormir a noite inteira pra Alice', valorCota: 300, cotas: 1 },
   { id: 'viagem',          nome: 'Fundo para a primeira viagem em família',          valorCota: 200,  cotas: 5 },
   { id: 'seguro',          nome: 'Seguro contra explosões de fralda',                valorCota: 150,  cotas: 3 },
+  { id: 'teste',           nome: 'Teste (R$ 1,00)',                                  valorCota: 1,    cotas: 1 },
 ];
 
 // ====== UTILITÁRIOS ======
@@ -514,7 +515,7 @@ function renderPresentes() {
 
     let corpo;
     if (g.naoRiscar) {
-      corpo = el('button', { class: 'btn mini', type: 'button', onclick: () => verPix(g) }, 'Ver Pix');
+      corpo = el('button', { class: 'btn mini', type: 'button', onclick: () => verPix(g) }, 'Quero dar e ver o Pix');
     } else if (unica) {
       const s = slots[0];
       corpo = cotas[s]
@@ -616,7 +617,32 @@ function mostrarPix(titulo, valor, aviso, podeDesfazer) {
   pixBox.hidden = false;
 }
 
+// Fraldas: pede o nome para o controle e só então mostra o Pix.
+function abrirFormFraldas(g) {
+  contexto = { gift: g, slot: null };
+  document.getElementById('janela-titulo').textContent = 'Fraldas';
+  document.getElementById('marcar-desc').textContent =
+    'Informe seu nome para a gente anotar no controle. Depois é só pagar o Pix de R$ ' + fmt(g.valorCota) + '.';
+  document.getElementById('btn-submit-marcar').textContent = 'Anotar e ver o Pix';
+  inputNomeMarcar.value = (() => { try { return localStorage.getItem('alice_nome') || ''; } catch { return ''; } })();
+  msgMarcar.textContent = '';
+  pixBox.hidden = true;
+  formMarcar.hidden = false;
+  abrirJanela();
+  inputNomeMarcar.focus();
+}
+
+async function registrarFralda(nome) {
+  const r = await api('fraldas', {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ nome }),
+  });
+  if (!r.ok) throw new Error('fraldas');
+}
+
 function verPix(g) {
+  if (g.naoRiscar) { abrirFormFraldas(g); return; }
   contexto = { gift: g, slot: null };
   mostrarPix(g.nome, valorDaCota(g),
     online ? '' : 'A lista não está disponível agora. Você pode pagar pelo Pix mesmo assim.', false);
@@ -627,6 +653,7 @@ function escolher(g, slot) {
   if (!online) { verPix(g); return; }
   contexto = { gift: g, slot };
   document.getElementById('janela-titulo').textContent = 'Marcar presente';
+  document.getElementById('btn-submit-marcar').textContent = 'Marcar e ver o Pix';
   document.getElementById('marcar-desc').textContent = g.cotas > 1
     ? 'Você vai dar a ' + slot.split('-').pop() + 'ª cota de "' + g.nome + '" (R$ ' + fmt(g.valorCota) + ').'
     : 'Você vai dar: ' + g.nome + ' (R$ ' + fmt(g.valorCota) + ').';
@@ -643,6 +670,22 @@ formMarcar.addEventListener('submit', async e => {
   const nome = inputNomeMarcar.value.trim();
   if (!nome) { msgMarcar.textContent = 'Escreva seu nome para marcar.'; inputNomeMarcar.focus(); return; }
   const { gift, slot } = contexto;
+
+  if (gift.naoRiscar) {
+    if (!online) {
+      mostrarPix(gift.nome, valorDaCota(gift), 'A lista ainda não está conectada. Pague pelo Pix mesmo assim.', false);
+      return;
+    }
+    try {
+      await registrarFralda(nome);
+      try { localStorage.setItem('alice_nome', nome); } catch {}
+      mostrarPix(gift.nome, valorDaCota(gift), 'Obrigada, ' + nome + '! Anotamos no controle.', false);
+    } catch {
+      msgMarcar.textContent = 'Não consegui anotar agora. Tente de novo.';
+    }
+    return;
+  }
+
   try {
     const resultado = await marcarCota(slot, gift.id, Number(slot.split('-').pop()), nome);
     if (resultado === 'ocupada') {
