@@ -536,7 +536,7 @@ function renderPresentes() {
     }
 
     const progresso = unica || g.naoRiscar ? null : el('p', { class: 'progresso' }, ocupados + ' de ' + g.cotas + ' marcadas');
-    const nota = g.naoRiscar ? el('p', { class: 'nota' }, 'Este item pode ser comprado por mais deuma pessoa.') : null;
+    const nota = g.naoRiscar ? el('p', { class: 'nota' }, 'Este item pode ser comprado por mais de uma pessoa.') : null;
     return el('article', { class: 'presente' + (feito ? ' feito' : '') }, topo, nota, progresso, corpo);
   }));
 }
